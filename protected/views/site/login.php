@@ -3,9 +3,9 @@
 /* @var $model LoginForm */
 /* @var $form CActiveForm  */
 
-$this->pageTitle = Yii::app ()->name . ' - Login';
-$this->breadcrumbs = array (
-		'Login' 
+$this->pageTitle=Yii::app()->name . ' - Login';
+$this->breadcrumbs=array(
+	'Login',
 );
 ?>
 
@@ -14,20 +14,15 @@ $this->breadcrumbs = array (
 <p>Please fill out the following form with your login credentials:</p>
 
 <div class="form">
-<?php
+<?php $form=$this->beginWidget('CActiveForm', array(
+	'id'=>'login-form',
+	'enableClientValidation'=>true,
+	'clientOptions'=>array(
+		'validateOnSubmit'=>true,
+	),
+)); ?>
 
-$form = $this->beginWidget ( 'CActiveForm', array (
-		'id' => 'login-form',
-		'enableClientValidation' => true,
-		'clientOptions' => array (
-				'validateOnSubmit' => true 
-		) 
-) );
-?>
-
-	<p class="note">
-		Fields with <span class="required">*</span> are required.
-	</p>
+	<p class="note">Fields with <span class="required">*</span> are required.</p>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'username'); ?>
@@ -40,15 +35,7 @@ $form = $this->beginWidget ( 'CActiveForm', array (
 		<?php echo $form->passwordField($model,'password'); ?>
 		<?php echo $form->error($model,'password'); ?>
 		<p class="hint">
-			Hint: You may login with
-			<kbd>demo</kbd>
-			/
-			<kbd>demo</kbd>
-			or
-			<kbd>admin</kbd>
-			/
-			<kbd>admin</kbd>
-			.
+			Hint: You may login with <kbd>demo</kbd>/<kbd>demo</kbd> or <kbd>admin</kbd>/<kbd>admin</kbd>.
 		</p>
 	</div>
 
@@ -63,5 +50,4 @@ $form = $this->beginWidget ( 'CActiveForm', array (
 	</div>
 
 <?php $this->endWidget(); ?>
-</div>
-<!-- form -->
+</div><!-- form -->
