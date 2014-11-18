@@ -7,7 +7,7 @@
 // CWebApplication properties can be configured here.
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'KdoMìStøíhá.cz',
+	'name'=>'KdoMï¿½Stï¿½ï¿½hï¿½.cz',
 
 	// preloading 'log' component
 	'preload'=>array(
@@ -58,6 +58,7 @@ return array(
 			'username' => 'root',
 			'password' => '',
 			'charset' => 'utf8',
+			'tablePrefix' => 'tbl_',
 		),
 		'booster'=>array(
 			'class' => 'ext.bootstrap.components.Booster',

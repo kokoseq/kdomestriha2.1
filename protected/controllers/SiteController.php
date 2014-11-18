@@ -71,7 +71,38 @@ class SiteController extends Controller
 		}
 		$this->render('contact',array('model'=>$model));
 	}
-
+	
+	/**
+	 * Displays the register page
+	 */
+	public function actionRegister()
+	{
+		//@todo Pokud je uzivatel prihlasen, presmerovat na administraci
+		
+		$model=new RegistrationForm();
+	
+		// if it is ajax validation request
+		if(isset($_POST['ajax']) && $_POST['ajax']==='registration-form')
+		{
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
+	
+		// collect user input data
+		if(isset($_POST['RegistrationForm']))
+		{
+			$model->attributes=$_POST['RegistrationForm'];
+			if($model->save()){
+				//@todo prihlaseni uzivatele
+				//@todo presmerovani na administraci
+			}
+			
+		}
+		// display the login form
+		$this->render('register', array('model'=>$model));
+	}
+	
+	
 	/**
 	 * Displays the login page
 	 */
