@@ -76,9 +76,7 @@ class SiteController extends Controller
 	 * Displays the register page
 	 */
 	public function actionRegister()
-	{
-		//@todo Pokud je uzivatel prihlasen, presmerovat na administraci
-		
+	{	
 		$model=new RegistrationForm();
 	
 		// if it is ajax validation request
@@ -93,7 +91,9 @@ class SiteController extends Controller
 		{
 			$model->attributes=$_POST['RegistrationForm'];
 			if($model->save()){
-				//@todo prihlaseni uzivatele
+				$loginForm = new LoginForm(new UserIdentity($model->email, $model->password));
+				$loginForm->login();
+				$this->redirect(array('site/index')); // automaticke prihlaseni uzivatele
 				//@todo presmerovani na administraci
 			}
 			

@@ -13,18 +13,31 @@ class RegistrationForm extends User
 	public function rules()
 	{
 		$rules = array(
-				array('email, password, password_repeate', 'required'),
+				array('email, password, password_repeate', 'required',
+						'message' => 'Toto pole je povinné'
+				),
+				array('email', 'unique', 'caseSensitive' => false,
+						'message' => "Tento email je již používaný"),
 				array('password', 'compare', 'compareAttribute'=>'password_repeate', 'message' => 'Zadaná hesla nejsou stejná'),
 				array('password', 'length', 'max'=>15, 'min' => 4, 
-						'tooShort' => 'Špatné heslo, délka musí být minimálně 4 znaky', 
-						'tooLong' => 'Špatné heslo, délka musí být maximálně 15 znaků'),
+						'tooShort' => 'Délka hesla musí být minimálně 4 znaky', 
+						'tooLong' => 'Délka hesla může být maximálně 15 znaků'),
 				array('nickname', 'unique', 'caseSensitive' => false,
-						'message' => "Tato přezdívka je už používaná"),
+						'message' => "Tato přezdívka je již používaná"),
 				//array('email', 'unique', 'caseSensitive' => false, 'message' => "Uživatel s tímto emailem již existuje"),
 		);
 		
-		//zdedeni pravidel z User modelu
+		//zdedeni pravidel z parent tridy
 		return array_merge($rules, parent::rules());
+	}
+	
+	public function attributeLabels()
+	{
+		$labels = array(
+				'password_repeate' => 'Ověření hesla'
+		);
+		
+		return array_merge($labels, parent::attributeLabels());
 	}
 	
 	/**
@@ -32,10 +45,13 @@ class RegistrationForm extends User
 	 * 
 	 * @see CActiveRecord::beforeSave()
 	 */
-	public function beforeSave()
+	public function afterValidate()
 	{
-		$this->reg_date = date("Y-m-d", time());
-		$this->auth_level = parent::AUTH_LEVEL_USER;
-		$this->password = $this->hashPassword($this->password);
+		parent::afterValidate();
+		if(!$this->hasErrors()){
+			$this->reg_date = date("Y-m-d", time());
+			$this->auth_level = parent::AUTH_LEVEL_USER;
+			$this->password = $this->hashPassword($this->password);
+		}
 	}
 }

@@ -82,7 +82,7 @@ class User extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'fb_id' => 'Fb',
-			'password' => 'Hesle',
+			'password' => 'Heslo',
 			'email' => 'Email',
 			'nickname' => 'Přezdívka',
 			'gender' => 'Gender',
@@ -113,6 +113,12 @@ class User extends CActiveRecord
 	}
 	
 	
+	/** Generuje Salt pro hash hesla 
+	 * 
+	 * @param number $cost
+	 * @throws Exception
+	 * @return string
+	 */
 	public function blowfishSalt($cost = 13)
 	{
 		if (!is_numeric($cost) || $cost < 4 || $cost > 31) {

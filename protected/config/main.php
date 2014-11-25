@@ -7,7 +7,7 @@
 // CWebApplication properties can be configured here.
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'KdoM�St��h�.cz',
+	'name'=>'KdoMěStříhá.cz',
 
 	// preloading 'log' component
 	'preload'=>array(
@@ -18,6 +18,7 @@ return array(
 	// autoloading model and component classes
 	'import'=>array(
 		'application.models.*',
+		'application.models.userManagement.*',
 		'application.components.*',
 	),
 

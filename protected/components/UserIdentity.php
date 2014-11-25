@@ -17,13 +17,15 @@ class UserIdentity extends CUserIdentity
 	 */
 	public function authenticate()
 	{
-		$user=User::model()->findByAttributes(array('email'=>$this->username));
-		//@todo	
+		$user=User::model()->findByAttributes(array('email'=>$this->username));	
 		
+		//pokud uzivatel neexistuje
 		if($user===null)
 			$this->errorCode=self::ERROR_USERNAME_INVALID;
-		else if(!$user->validatePassword)
+		//pokud zadal spatne heslo nebo email
+		else if(!$user->validatePassword($this->password))
 			$this->errorCode=self::ERROR_PASSWORD_INVALID;
+		//jinak je vse spravne
 		else
 		{	
 			$this->_id = $user->id;

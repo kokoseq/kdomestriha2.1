@@ -12,6 +12,11 @@ class LoginForm extends CFormModel
 
 	private $_identity;
 
+	function __construct($identity = null) {
+		$this->_identity = $identity;
+		parent::__construct();
+	}
+	
 	/**
 	 * Declares the validation rules.
 	 * The rules state that username and password are required,
@@ -20,9 +25,8 @@ class LoginForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			// username and password are required
 			array('email, password', 'required'),
-			// password needs to be authenticated
+			array('email', 'email'),
 			array('password', 'authenticate'),
 		);
 	}
