@@ -60,6 +60,7 @@ class LoginForm extends CFormModel
 	{
 		if($this->_identity===null)
 		{
+			//pouziti emailu jako username
 			$this->_identity=new UserIdentity($this->email,$this->password);
 			$this->_identity->authenticate();
 		}

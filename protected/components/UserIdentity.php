@@ -7,34 +7,36 @@
  */
 class UserIdentity extends CUserIdentity
 {
-	public $email;
 	private $_id;
-	
-	public function __construct($username, $password, $email)
-	{
-		parent::__construct($username, $password);
-		$this->email = $email;
-	}
 	
 	/**
 	 * Authenticates a user.
+	 * Prihlasovaci jmeno ($username) je email
 	 * 
 	 * @return boolean whether authentication succeeds.
 	 */
 	public function authenticate()
 	{
-		$user=User::model()->find('LOWER(email)=?', array(
-			strlower($this->email)	
-			//@todo pokracovat
-		));
+		$user=User::model()->findByAttributes(array('email'=>$this->username));
+		//@todo	
 		
-		
-		if(!isset($users[$this->username]))
+		if($user===null)
 			$this->errorCode=self::ERROR_USERNAME_INVALID;
-		elseif($users[$this->username]!==$this->password)
+		else if(!$user->validatePassword)
 			$this->errorCode=self::ERROR_PASSWORD_INVALID;
 		else
+		{	
+			$this->_id = $user->id;
 			$this->errorCode=self::ERROR_NONE;
+		}
 		return !$this->errorCode;
+	}
+	
+	/**
+	 * @see CUserIdentity::getId()
+	 */
+	public function getId()
+	{
+		return $this->_id;	
 	}
 }
