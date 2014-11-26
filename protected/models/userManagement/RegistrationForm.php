@@ -12,32 +12,21 @@ class RegistrationForm extends User
 	 */
 	public function rules()
 	{
-		$rules = array(
+		
+		//zdedeni pravidel z parent tridy a pridani vlastnich pravidel
+		return array_merge(parent::rules(), array(
 				array('email, password, password_repeate', 'required',
 						'message' => 'Toto pole je povinné'
 				),
+				array('password', 'compare', 'compareAttribute'=>'password_repeate', 'message' => 'Zadaná hesla nejsou stejná'),
 				array('email', 'unique', 'caseSensitive' => false,
 						'message' => "Tento email je již používaný"),
-				array('password', 'compare', 'compareAttribute'=>'password_repeate', 'message' => 'Zadaná hesla nejsou stejná'),
-				array('password', 'length', 'max'=>15, 'min' => 4, 
-						'tooShort' => 'Délka hesla musí být minimálně 4 znaky', 
-						'tooLong' => 'Délka hesla může být maximálně 15 znaků'),
 				array('nickname', 'unique', 'caseSensitive' => false,
 						'message' => "Tato přezdívka je již používaná"),
+				array('nickname', 'default', 'setOnEmpty' => true, 'value' => null),
 				//array('email', 'unique', 'caseSensitive' => false, 'message' => "Uživatel s tímto emailem již existuje"),
+				)
 		);
-		
-		//zdedeni pravidel z parent tridy
-		return array_merge($rules, parent::rules());
-	}
-	
-	public function attributeLabels()
-	{
-		$labels = array(
-				'password_repeate' => 'Ověření hesla'
-		);
-		
-		return array_merge($labels, parent::attributeLabels());
 	}
 	
 	/**

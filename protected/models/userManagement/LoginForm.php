@@ -11,11 +11,6 @@ class LoginForm extends CFormModel
 	public $password;
 
 	private $_identity;
-
-	function __construct($identity = null) {
-		$this->_identity = $identity;
-		parent::__construct();
-	}
 	
 	/**
 	 * Declares the validation rules.
@@ -76,5 +71,12 @@ class LoginForm extends CFormModel
 		}
 		else
 			return false;
+	}
+	
+	public function fakeLogin($email, $password)
+	{
+		$this->email = $email;
+		$this->password = $password;
+		$this->login();
 	}
 }

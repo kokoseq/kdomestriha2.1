@@ -12,6 +12,7 @@
  * @property integer $gender
  * @property string $reg_date
  * @property integer $auth_level
+ * @property string $resetKey
  *
  * The followings are the available model relations:
  * @property Salon[] $createdSalons
@@ -54,6 +55,9 @@ class User extends CActiveRecord
 					'tooLong' => 'Maximální délka emailu je 45 znaků'),
 			array('email', 'email', 'message' => 'Zadaný text není emailová adresa'),
 			array('gender, auth_level', 'numerical', 'integerOnly'=>true),
+			array('password', 'length', 'max'=>15, 'min' => 4,
+					'tooShort' => 'Délka hesla musí být minimálně 4 znaky',
+					'tooLong' => 'Délka hesla může být maximálně 15 znaků'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, fb_id, password, email, nickname, gender, reg_date, auth_level', 'safe', 'on'=>'search'),
@@ -88,6 +92,7 @@ class User extends CActiveRecord
 			'gender' => 'Gender',
 			'reg_date' => 'Reg Date',
 			'auth_level' => 'Auth Level',
+			'password_repeate' => 'Ověření hesla',
 		);
 	}
 	
@@ -108,8 +113,8 @@ class User extends CActiveRecord
 	 * @param $password heslo zadane uzivatelem
 	 * @return string
 	 */
-	public function hashPassword($password){
-		return crypt($password, $this->blowfishSalt());
+	public static function hashPassword($password){
+		return crypt($password, self::blowfishSalt());
 	}
 	
 	

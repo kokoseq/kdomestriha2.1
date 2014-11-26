@@ -73,7 +73,7 @@ class SiteController extends Controller
 	}
 	
 	/**
-	 * Displays the register page
+	 * Zobrazeni stranky pro registraci
 	 */
 	public function actionRegister()
 	{	
@@ -91,8 +91,8 @@ class SiteController extends Controller
 		{
 			$model->attributes=$_POST['RegistrationForm'];
 			if($model->save()){
-				$loginForm = new LoginForm(new UserIdentity($model->email, $model->password));
-				$loginForm->login();
+				$loginForm = new LoginForm();
+				$loginForm->fakeLogin($model->email, $_POST['RegistrationForm']['password']);
 				$this->redirect(array('site/index')); // automaticke prihlaseni uzivatele
 				//@todo presmerovani na administraci
 			}
@@ -100,6 +100,111 @@ class SiteController extends Controller
 		}
 		// display the login form
 		$this->render('register', array('model'=>$model));
+	}
+	
+	/**
+	 * Zobrazeni stranky pro obnoveni hesla.
+	 * Mohou nastat dva pripady:
+	 * 1) Uzivatel teprve zada o obnovu hesla. Vyplni email a system odesle informace pro obnovu (resetSubmit)
+	 * 2) Uzivatel prisel pres aktivacni link. System zobrazi formular pro zadani hesla a
+	 * po vyplneni spravnych udaju uzivatele rovnou prhlasi.
+	 */
+	public function actionResetPassword()
+	{
+		
+		if(isset($_GET['resetKey']))
+		{
+			$scenario = 'resetSubmit';
+			$model = $this->resetSubmit($_GET['resetKey']);
+		}
+		else
+		{
+			$scenario = 'resetRequest';
+			$model = $this->resetRequest();
+		}	
+		
+		$this->render('resetPassword', array(
+				'model' => $model,
+				'scenario' => $scenario,
+			)
+		);
+	}
+	
+	/**
+	 *  Zprocesovani scenare, kdy uzivatel zada o obnovu hesla.
+	 *  Uzivatel vyplni email, system overi, zda uzivatel existuje a
+	 *  odesle informace pro obnovu.
+	 *  
+	 *  @return ResetPasswordForm
+	 */
+	public function resetRequest()
+	{
+		$model = new ResetPasswordForm('resetRequest'); // vytvoreni reset form se scenarem, kdy uzivatel zada o obnovu hesla a zadava pouze email
+		
+		if(isset($_POST['ResetPasswordForm']))
+		{
+			$model->attributes = $_POST['ResetPasswordForm'];
+			
+			if($model->validate()){
+				$user = User::model()->findByAttributes(array('email' => $_POST['ResetPasswordForm']['email']));
+				$resetKey = $this->createResetKey();
+				
+				$user->resetKey = $resetKey;
+				if($user->saveAttributes(array('resetKey'=> $resetKey))) // ulozeni reset klice do databaze
+				{ 
+					MailSender::sendResetPasswordMail($user->email, $resetKey); // odeslani emailu s informaceni pro obnovu hesla
+					Yii::app()->user->setFlash('resetPasswordMessage', "Prosím zkontrolujte svoji emailovou schránku. Byly vám odeslány instrukce pro obnovení hesla.");
+					$this->refresh();
+				}
+			}
+		}
+		
+		return $model;
+	}
+	
+	/**
+	 * Zprocesovani scenare, kdy uzivatel prijde pers aktivacni link.
+	 * Uzivatel vyplni nove heslo a overeni hesla.
+	 * System odesle informaci o obnove hesla na email.
+	 * 
+	 * @return ResetPasswordForm
+	 */
+	public function resetSubmit($resetKey)
+	{
+		$user = User::model()->findByAttributes(array('resetKey' => $resetKey)); // vyhledani uzivatele podle reset key
+			
+		if(isset($user)){
+			$model = new ResetPasswordForm('resetSubmit'); // vytvoreni reset form se scenarem, kdy uzivatel prisel pres aktivacni link
+			
+			if(isset($_POST['ResetPasswordForm']))
+			{
+				$model->attributes = $_POST['ResetPasswordForm'];
+				
+				if($model->validate()){
+					if($user->saveAttributes(array('password' => User::hashPassword($model->password)))) // ulozeni noveho hesla
+					{
+						MailSender::sendResetSubmitMail($user->email); // odeslani mailu ohledne zmeny hesla
+						Yii::app()->user->setFlash('resetPasswordMessage', "Vaše heslo bylo úspěšně změněno a bylo provedeno přihlášení");
+						$loginForm = new LoginForm(); // prihlaseni uzivatele
+						$loginForm->fakeLogin($user->email, $model->password);
+						$this->refresh(); //@todo presmerovani na administraci
+					}
+				}
+			}
+			
+			return $model;
+		}
+		
+		Yii::app()->user->setFlash('resetPasswordMessage', "Zadaný aktivační odkaz je neplatný.");
+		$this->redirect(array('site/resetPassword'));
+	}
+	
+	/**
+	 * @return string aktivacni kod dlouhy 30 znaku
+	 */
+	public function createResetKey()
+	{
+		return substr(md5(microtime()), 0, -2);
 	}
 	
 	
