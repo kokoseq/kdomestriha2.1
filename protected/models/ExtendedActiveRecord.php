@@ -16,12 +16,12 @@ abstract class ExtendedActiveRecord extends CActiveRecord
 					)
 		);
 		
-		if ($this->hasAttribute($createAttr)) 
-			$behavior['CTimestampBehavior']['createAttribute'] = $createAttr;
+		if ($this->hasAttribute($this->createAttr)) 
+			$behavior['CTimestampBehavior']['createAttribute'] = $this->createAttr;
 		
-		if ($this->hasAttribute($updateAttr))
+		if ($this->hasAttribute($this->updateAttr))
 		{
-			$behavior['CTimestampBehavior']['updateAttribute'] = $updateAttr;
+			$behavior['CTimestampBehavior']['updateAttribute'] = $this->updateAttr;
 			$behavior['CTimestampBehavior']['setUpdateOnCreate'] = true;
 		}
 		

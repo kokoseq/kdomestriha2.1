@@ -112,12 +112,12 @@ class SiteController extends Controller
 	public function actionResetPassword()
 	{
 		
-		if(isset($_GET['resetKey']))
+		if(isset($_GET['resetKey'])) // Uzivatel prisel pres aktivacni link
 		{
 			$scenario = 'resetSubmit';
 			$model = $this->resetSubmit($_GET['resetKey']);
 		}
-		else
+		else // Uzivatel teprve zada o obnovu hesla
 		{
 			$scenario = 'resetRequest';
 			$model = $this->resetRequest();
