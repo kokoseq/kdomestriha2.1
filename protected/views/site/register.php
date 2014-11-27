@@ -5,7 +5,7 @@
 $form = $this->beginWidget(
 	'booster.widgets.TbActiveForm',
 	array(
-		'id' => 'registration-form',		
+		'id' => 'salon-create-form',		
 		)
 );
 

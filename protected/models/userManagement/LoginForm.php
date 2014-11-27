@@ -20,8 +20,8 @@ class LoginForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('email, password', 'required'),
-			array('email', 'email'),
+			array('email, password', 'required', 'message' => 'Toto pole je povinné'),
+			array('email', 'email', 'message' => 'Zadaný text není emailová adresa'),
 			array('password', 'authenticate'),
 		);
 	}

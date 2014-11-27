@@ -57,26 +57,101 @@ class SalonController extends Controller
 	}
 
 	/**
-	 * Creates a new model.
+	 * Vytvoreni noveho kadernictvi. Kadernictvi muze byt vytvoreno
+	 * registrovanym nebo neregistrovanym uzivatelem.
+	 * 
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 */
 	public function actionCreate()
 	{
-		$model=new Salon;
-
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
-
-		if(isset($_POST['Salon']))
+		
+		if (!Yii::app()->user->isGuest)
 		{
-			$model->attributes=$_POST['Salon'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			$scenario = 'registeredCreate';
+			$model = $this->registeredCreate();
+		}
+		else
+		{
+			$scenario = 'unregisteredCreate';
+			$model = $this->unregisteredCreate();
 		}
 
 		$this->render('create',array(
 			'model'=>$model,
+			'scenario'=>$scenario,
 		));
+	}
+	
+	/**
+	 * Vytvoreni kadernictvi registrovanym uzivatelem.
+	 * Uzivatel je nastaven jako vlastnik kadernictvi.
+	 * 
+	 * @return Salon
+	 */
+	public function registeredCreate()
+	{
+		$model=new Salon;
+		$user = User::getUserById(Yii::app()->user->id);
+
+		if(isset($_POST['Salon']))
+		{
+			$model->attributes=$_POST['Salon'];
+			$model->owner_user_id = $user->id; // nastaveni vlastnika
+				
+			if($model->save())
+			{
+				$this->redirect(array('view','id'=>$model->id));
+			}
+		}
+		
+		return $model;
+	}
+	
+	/**
+	 * Vytvoreni kadernictvi neregistrovanym uzivatelem.
+	 * Pokud uzivatel se zadanou emailovou adresou neexistuje,
+	 * je take vytvoren.
+	 * 
+	 * @return multitype:RegistrationForm Salon 
+	 */
+	public function unregisteredCreate()
+	{
+		$model=new Salon;
+		$user=new RegistrationForm;
+		
+		if(isset($_POST['Salon'], $_POST['RegistrationForm']))
+		{
+			$model->attributes=$_POST['Salon'];
+			$user->attributes=$_POST['RegistrationForm'];
+				
+			$valid = $model->validate();
+			$valid = $user->validate() && $valid;
+				
+			if($valid)
+			{
+				$tmp = User::getUserByEmail($user->email);
+				
+				// pokud uzivatel se zadanym emailem neexistuje, ulozi se a nastavi
+				// se jako create_user_id
+				if($tmp == null)
+				{
+					$user->save(false);
+					$model->create_user_id = $user->getPrimaryKey();
+				}
+				else // pokud uzivatel se zadanym emailem existuje, nastavi se jako create_user_id
+					$model->create_user_id = $tmp->id;
+					
+				$model->save(false);
+		
+				$this->redirect(array('view','id'=>$model->id));
+			}
+
+		}
+		
+		return array(
+				'user' => $user,
+				'model' => $model
+		);
 	}
 
 	/**

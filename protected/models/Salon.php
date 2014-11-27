@@ -37,6 +37,9 @@ class Salon extends ExtendedActiveRecord
 {
 	const DESC_LENGTH = 300;
 	
+	const ACC_LEVEL_FREE = 0;
+	const  ACC_LEVEL_PAID = 1;
+	
 	/**
 	 * @return string the associated database table name
 	 */
@@ -90,10 +93,27 @@ class Salon extends ExtendedActiveRecord
 		$toSanitize = array('name', 'address', 'description');
 		$toSanitizeWeb =  array('website', 'fb_site');
 		
-		$this->attributes = InputSanitizer::SanitizeModel($this, $toSanitize);
-		$this->attributes = InputSanitizer::SanitizeModelWebsites($this, $toSanitizeWeb);
+		$this->attributes = InputSanitizer::sanitizeModel($this, $toSanitize);
+		$this->attributes = InputSanitizer::sanitizeModelWebsites($this, $toSanitizeWeb);
 	
 		return parent::beforeValidate();
+	}
+	
+	protected function beforeSave(){
+		if ($this->isNewRecord)
+		{
+			$this->avg_price_men = 0;
+			$this->avg_price_women = 0;
+			$this->avg_rating = 0.0;
+			$this->avg_sub_rating1 = 0.0;
+			$this->avg_sub_rating2 = 0.0;
+			$this->avg_sub_rating3 = 0.0;
+			$this->account_level = self::ACC_LEVEL_FREE;
+		}
+		
+		$this->name = InputSanitizer::sanitizeName($this->name);
+		
+		return parent::beforeSave();
 	}
 
 	/**

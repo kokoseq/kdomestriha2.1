@@ -77,7 +77,7 @@ class SiteController extends Controller
 	 */
 	public function actionRegister()
 	{	
-		$model=new RegistrationForm();
+		$model=new RegistrationForm('registration');
 	
 		// if it is ajax validation request
 		if(isset($_POST['ajax']) && $_POST['ajax']==='registration-form')

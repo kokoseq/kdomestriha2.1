@@ -124,7 +124,7 @@ class User extends CActiveRecord
 	 * @throws Exception
 	 * @return string
 	 */
-	public function blowfishSalt($cost = 13)
+	public static function blowfishSalt($cost = 13)
 	{
 		if (!is_numeric($cost) || $cost < 4 || $cost > 31) {
 			throw new Exception("cost parameter must be between 4 and 31");
@@ -172,6 +172,25 @@ class User extends CActiveRecord
 		));
 	}
 
+	/**
+	 * Vraci model uzivatele podle id
+	 * 
+	 * @param $id
+	 * @throws CHttpException
+	 * @return user model
+	 */
+	public static function getUserById($id)
+	{
+		$model = User::model()->findByPk($id);
+		return $model;
+	}
+	
+	public static function getUserByEmail($email)
+	{
+		$model = User::model()->findByAttributes(array('email' => $email));
+		return $model;
+	}
+	
 	/**
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
